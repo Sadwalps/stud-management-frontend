@@ -1,0 +1,9 @@
+#homepage{
+  background-image: url(https://wallpaper-house.com/data/out/8/wallpaper2you_240233.jpg);
+  background-repeat: no-repeat;
+  background-size: cover;
+  height: 100vh;
+}
+#allstudentsdetails{
+  min-height: 80vh;
+}
