@@ -2,11 +2,54 @@ import React from 'react'
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
-function Edit() {
+import { editdetailsAPI } from './service/allApi';
+function Edit({ setEditstatus, setEdit }) {
     const [show, setShow] = useState(false);
 
-    const handleClose = () => setShow(false);
+    const handleClose = () => {
+        setShow(false)
+        handleCancel()
+    }
     const handleShow = () => setShow(true);
+
+    const [editdetails, setEditdetails] = useState({
+        name: setEditstatus?.name,
+        age: setEditstatus?.age,
+        contact: setEditstatus?.contact,
+        profile: setEditstatus?.profile
+    })
+    console.log(editdetails);
+
+    const handleCancel = () => {
+        setEditdetails({
+            name: setEditstatus?.name,
+            age: setEditstatus?.age,
+            contact: setEditstatus?.contact,
+            profile: setEditstatus?.profile
+        })
+    }
+
+    const handleEdit = async (id) => {
+        const { name, age, contact, profile } = editdetails
+        console.log(name, age, contact, profile);
+        if (!name || !age || !contact || !profile) {
+            alert(`Fill the form completely`)
+        } else {
+            const result = editdetailsAPI({ id, name, age, contact, profile })
+            if (result.status >= 200 && result.status < 300) {
+                console.log(result);
+                alert(`Details successfully updated`)
+                setEdit(result)
+            }else{
+                alert(`Something went wrong`)
+            }
+        }
+
+
+    }
+
+
+
     return (
         <>
             <button onClick={handleShow} className='btn btn-primary rounded-0' style={{ fontWeight: "bold" }}>Edit</button>
@@ -15,19 +58,17 @@ function Edit() {
                     <Modal.Title style={{ fontWeight: "bold" }} className='text-warning'>Edit Students Details</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <div className='container-fluid d-flex justify-content-center'>
-                        <img src="https://img.freepik.com/premium-photo/user-icon-with-tick-mark_1255023-23188.jpg" className='w-75' alt="" />
-                    </div>
-                    <input type="text" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Name' />
-                    <input type="number" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Age' />
-                    <input type="number" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Contact Number' />
+                    <input value={editdetails.profile} onChange={(e) => setEditdetails({ ...editdetails, profile: e.target.value })} type="text" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Profile pic url' />
+                    <input value={editdetails.name} onChange={(e) => setEditdetails({ ...editdetails, name: e.target.value })} type="text" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Name' />
+                    <input value={editdetails.age} onChange={(e) => setEditdetails({ ...editdetails, age: e.target.value })} type="number" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Age' />
+                    <input value={editdetails.contact} onChange={(e) => setEditdetails({ ...editdetails, contact: e.target.value })} type="number" className=' mt-2 form-control py-2 rounded-0 bg-warning' style={{ fontWeight: "bold" }} placeholder='Contact Number' />
 
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="danger rounded-0" onClick={handleClose}>
+                    <Button variant="danger rounded-0" onClick={handleCancel}>
                         Cancel
                     </Button>
-                    <Button variant="warning rounded-0" onClick={handleClose}>
+                    <Button variant="warning rounded-0" onClick={ handleEdit}>
                         Save changes
                     </Button>
                 </Modal.Footer>
