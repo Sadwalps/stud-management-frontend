@@ -17,6 +17,6 @@ export const deletedetailsAPI= async(id)=>{
 }
 
 //api for edit students details
-export const editdetailsAPI = async(id,reqbody)=>{
+export const editdetailsAPI = async(id, reqbody)=>{
     return await commonAPI(`PUT`, `${serverURL}/details/${id} `, reqbody)
 }

@@ -2,15 +2,22 @@ import React, { useEffect } from 'react'
 import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
+import Card from 'react-bootstrap/Card';
 
-import Detailscard from './Detailscard';
-import { adddetailsAPI } from './service/allApi';
+
+import { adddetailsAPI, deletedetailsAPI, getdetailsAPI } from './service/allApi';
+import Edit from './Edit';
 
 function Home() {
 
     const [show, setShow] = useState(false);
-    const [addstatus, setAddstatus] = useState([])
-    const [getstatus, setGetstatus] =useState([])
+    const [addstatus, setAddstatus] = useState({})
+    const [getdetails, setGetdetails] = useState([])
+    const [deletestatus, setDeletestatus] = useState({})
+    const [ editstatus, setEditstatus]= useState({})
+
+
+
     const [details, setDetails] = useState({
         profile: "",
         name: "",
@@ -18,6 +25,8 @@ function Home() {
         contact: ""
     })
     console.log(details);
+
+
 
     const handleClose = () => {
         handleCancel()
@@ -52,9 +61,24 @@ function Home() {
     }
 
 
-    useEffect(()=>{
+    const getalldetails = async () => {
+        const result = await getdetailsAPI()
+        setGetdetails(result.data)
+    }
+    console.log(getdetails);
 
-    },[getstatus])
+
+    const handleDelete = async (id) => {
+        const result = await deletedetailsAPI(id)
+        if (result.status >= 200 && result.status < 300) {
+            alert(`Details successfully deleted`)
+            setDeletestatus(result)
+        }
+    }
+
+    useEffect(() => {
+        getalldetails()
+    }, [addstatus,deletestatus,editstatus])
 
 
     return (
@@ -86,12 +110,30 @@ function Home() {
             {/* All students details */}
             <div id='allstudentsdetails'>
                 <h1 className='text-center text-warning mt-4 mb-3' style={{ fontWeight: "bold" }}>All students details</h1>
-              { getstatus? <div className='container-fluid'>
-                   {getstatus?.map((item)=>( <Detailscard setGetstatus={setGetstatus} item={item} addstatus={addstatus}/>))}
+                {getdetails.length > 0 ? <div className='container-fluid'>
+                    <div className="row">
+                        {getdetails?.map((item) => (<div className="col-md-4 d-flex justify-content-center mt-2">
+                            <Card className='bg-warning rounded-0 border-0 ' style={{ width: '22rem', fontWeight: "bold" }}>
+                                <Card.Img variant="top" className='rounded-0' src={item?.profile} />
+                                <Card.Body>
+                                    <Card.Title style={{ fontWeight: "bold" }}>Name: {item?.name}</Card.Title>
+                                    <Card.Text>
+                                        Age: {item?.age}
+                                    </Card.Text>
+                                    <Card.Text>
+                                        Contact: {item?.contact}
+                                    </Card.Text>
+                                    <div className='d-flex justify-content-between'>
+                                        <Edit item = {item} setEditstatus={setEditstatus}/>
+                                        <button onClick={() => handleDelete(item?.id)} className='btn btn-danger rounded-0'>Delete</button>
+                                    </div>
+                                </Card.Body>
+                            </Card>
+                        </div>))}
+                    </div>
+                </div> :
 
-                </div>:
-
-                <h1 className='text-center text-warning mt-4 mb-3' style={{ fontWeight: "bold" }}>No students details added yet!!!</h1>}
+                    <h1 className='text-center text-warning mt-4 mb-3' style={{ fontWeight: "bold" }}>No students details added yet!!!</h1>}
             </div>
         </>
     )

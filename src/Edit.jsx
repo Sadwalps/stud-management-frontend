@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { editdetailsAPI } from './service/allApi';
-function Edit({ setEditstatus, setEdit }) {
+function Edit({ item, setEditstatus }) {
     const [show, setShow] = useState(false);
 
     const handleClose = () => {
@@ -13,19 +13,19 @@ function Edit({ setEditstatus, setEdit }) {
     const handleShow = () => setShow(true);
 
     const [editdetails, setEditdetails] = useState({
-        name: setEditstatus?.name,
-        age: setEditstatus?.age,
-        contact: setEditstatus?.contact,
-        profile: setEditstatus?.profile
+        name: item?.name,
+        age: item?.age,
+        contact: item?.contact,
+        profile: item?.profile
     })
     console.log(editdetails);
 
     const handleCancel = () => {
         setEditdetails({
-            name: setEditstatus?.name,
-            age: setEditstatus?.age,
-            contact: setEditstatus?.contact,
-            profile: setEditstatus?.profile
+            name: item?.name,
+            age: item?.age,
+            contact: item?.contact,
+            profile: item?.profile
         })
     }
 
@@ -35,20 +35,22 @@ function Edit({ setEditstatus, setEdit }) {
         if (!name || !age || !contact || !profile) {
             alert(`Fill the form completely`)
         } else {
-            const result = editdetailsAPI({ id, name, age, contact, profile })
-            if (result.status >= 200 && result.status < 300) {
-                console.log(result);
-                alert(`Details successfully updated`)
-                setEdit(result)
-            }else{
-                alert(`Something went wrong`)
+            const reqbody = {
+                name: name,
+                age: age,
+                contact: contact,
+                profile: profile
             }
+            const result = editdetailsAPI(id, reqbody)
+            console.log(result);
+
+            setEditstatus(result)
+            alert(`Details successfully updated`)
+            setTimeout(() => {
+                handleClose()
+            }, 1000);
         }
-
-
     }
-
-
 
     return (
         <>
@@ -68,7 +70,7 @@ function Edit({ setEditstatus, setEdit }) {
                     <Button variant="danger rounded-0" onClick={handleCancel}>
                         Cancel
                     </Button>
-                    <Button variant="warning rounded-0" onClick={ handleEdit}>
+                    <Button variant="warning rounded-0" onClick={() => handleEdit(item.id)}>
                         Save changes
                     </Button>
                 </Modal.Footer>
